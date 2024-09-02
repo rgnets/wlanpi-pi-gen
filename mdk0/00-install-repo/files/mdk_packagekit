@@ -1,0 +1,3 @@
+Package: *  
+Pin: origin https://packagecloud.io/install/repositories/rgnets_mdk/wlanpi-dev/
+Pin-Priority: 1001  
