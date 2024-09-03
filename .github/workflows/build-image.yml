@@ -27,7 +27,7 @@ on:
 
 jobs:
   build:
-    runs-on: 'ubuntu-22.04'
+    runs-on: "${{ vars.RUNS_ON || 'ubuntu-22.04' }}"
 
     steps:
       - name: Free Disk Space (Ubuntu)
@@ -99,11 +99,11 @@ jobs:
           path: deploy/*.log
 
   slack-workflow-status:
-    if: always()
+    if: ${{ always() && (vars.SKIP_SLACK != 'true') }}
     name: Post Workflow Status to Slack
     needs:
       - build
-    runs-on: 'ubuntu-22.04'
+    runs-on: "${{ vars.RUNS_ON || 'ubuntu-22.04' }}"
     steps:
       - name: Slack Workflow Notification
         uses: Gamesight/slack-workflow-status@master
