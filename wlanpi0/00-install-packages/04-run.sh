@@ -8,7 +8,7 @@ on_chroot <<CHEOF
 	# Add packagecloud wlanpi/main repository
 	curl -s https://packagecloud.io/install/repositories/wlanpi/main/script.deb.sh | bash
 
-	# Removed packagecloud wlanpi/dev repository
+	# Packagecloud wlanpi/dev repository
  	# curl -s https://packagecloud.io/install/repositories/wlanpi/dev/script.deb.sh | bash
 
 	# Add Bullseye Backports repository

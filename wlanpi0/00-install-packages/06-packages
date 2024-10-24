@@ -1,10 +1,11 @@
-# Install our custom packages
+# Install WLAN Pi packages
 wlanpi-common
 wlanpi-profiler
+wlanpi-core
 wlanpi-webui
+wlanpi-bluetooth
 wlanpi-fpms
 wlanpi-kernel
-wlanpi-bluetooth
 wlanpi-hotspot
 wlanpi-wconsole
 wlanpi-server
@@ -20,8 +21,5 @@ cockpit/bullseye-backports
 cockpit-packagekit
 cockpit-storaged
 
-# In development
-#wlanpi-core
-
-# No longer supported
-#wiperf
+# wiperf is no longer supported
+# wiperf
