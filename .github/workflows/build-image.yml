@@ -24,6 +24,7 @@ on:
   push:
     branches:
       - force-build
+      - rg-dev
 
 jobs:
   build:
