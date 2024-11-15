@@ -1,13 +1,13 @@
-IMG_NAME='wlanpi'
+IMG_NAME='rg-wlanpi'
 RELEASE='bullseye'
 DEPLOY_ZIP='1'
 LOCALE_DEFAULT='en_US.UTF-8'
-TARGET_HOSTNAME='wlanpi'
+TARGET_HOSTNAME='rg-wlanpi'
 KEYBOARD_KEYMAP='us'
 KEYBOARD_LAYOUT='English (US)'
 TIMEZONE_DEFAULT='America/Chicago'
-FIRST_USER_NAME='wlanpi'
-FIRST_USER_PASS='wlanpi'
+#FIRST_USER_NAME='wlanpi' # Sourced from build vars
+#FIRST_USER_PASS='wlanpi' # Sourced from build vars
 WPA_COUNTRY='US'
 #WPA_ESSID=''
 #WPA_PASSWORD=''

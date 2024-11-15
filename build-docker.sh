@@ -104,6 +104,8 @@ if [ "${CONTAINER_EXISTS}" != "" ]; then
 		-e "LAST_VERSION=${LAST_VERSION}" \
 		-e "LAST_VERSION_HASH=${LAST_VERSION_HASH}" \
 		-e "COMMITS_FROM_LAST=${COMMITS_FROM_LAST}" \
+		-e "FIRST_USER_NAME=${FIRST_USER_NAME}" \
+		-e "FIRST_USER_PASS=${FIRST_USER_PASS}" \
 		-v $VOLUME \
 		--volumes-from="${CONTAINER_NAME}" --name "${CONTAINER_NAME}_cont" \
 		pi-gen \
@@ -126,6 +128,8 @@ else
 		-e "LAST_VERSION=${LAST_VERSION}" \
 		-e "LAST_VERSION_HASH=${LAST_VERSION_HASH}" \
 		-e "COMMITS_FROM_LAST=${COMMITS_FROM_LAST}" \
+		-e "FIRST_USER_NAME=${FIRST_USER_NAME}" \
+		-e "FIRST_USER_PASS=${FIRST_USER_PASS}" \
 		-v $VOLUME \
 		pi-gen \
 		bash -e -o pipefail -c "dpkg-reconfigure qemu-user-static &&
