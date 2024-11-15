@@ -9,3 +9,6 @@ unlink /usr/local/bin/speedtest
 
 # Don't autostart first boot service
 systemctl disable wlanpi-first-boot
+
+wlanpi-reg-domain set US
+reboot
