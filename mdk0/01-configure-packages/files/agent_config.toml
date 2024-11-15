@@ -1,0 +1,3 @@
+[General]
+#override_rxg=
+fallback_rxg="piglet.rgnets.com"
