@@ -111,7 +111,7 @@ jobs:
           files: |
             deploy/*.zip
             deploy/*.info
-            deploy/wlanpi-os/os.json
+            deploy/rg-wlanpi-os/os.json
             deploy/*.sha256
 
       - name: Upload logs

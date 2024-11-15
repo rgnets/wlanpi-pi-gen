@@ -6,6 +6,7 @@ copy_overlay /lib/systemd/system/wlanpi-first-boot.service -o root -g root -m 64
 
 on_chroot <<CHEOF
 	systemctl enable wlanpi-first-boot
+	wlanpi-reg-domain set US
 CHEOF
 
 
