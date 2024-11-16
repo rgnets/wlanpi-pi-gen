@@ -32,6 +32,7 @@ jobs:
     runs-on: "${{ vars.RUNS_ON || 'ubuntu-22.04' }}"
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -120,6 +121,11 @@ jobs:
         with:
           name: ${{ env.ARTIFACT_NAME }}-buildlogs
           path: deploy/*.log
+
+      - name: Chown the dir for next time
+        if: always()
+        run: |
+          sudo chown -R ubuntu:ubuntu ./*
 
   slack-workflow-status:
     if: ${{ always() && (github.repository_owner == 'WLAN-Pi') && (! github.event.pull_request.head.repo.fork) }}
