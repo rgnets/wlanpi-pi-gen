@@ -31,7 +31,7 @@ dvfs=1
 
 # Disable CM4's Wi-Fi and BT radio if they are present
 #dtoverlay=disable-wifi
-dtoverlay=disable-bt
+#dtoverlay=disable-bt
 
 [pi4]
 # Enable DRM VC4 V3D driver on top of the dispmanx display stack
