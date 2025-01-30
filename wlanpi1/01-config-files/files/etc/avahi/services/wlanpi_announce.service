@@ -5,7 +5,7 @@
 <service>
 <type>_http._tcp</type>
 <port>31415</port>
-<txt-record>model=WLAN Pi Go</txt-record>
-<txt-record>ver=3.2.0</txt-record>
+<txt-record>model=WLAN Pi</txt-record>
+<txt-record>ver=0</txt-record>
 </service>
 </service-group>
