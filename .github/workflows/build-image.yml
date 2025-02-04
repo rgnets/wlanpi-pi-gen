@@ -48,13 +48,6 @@ jobs:
           last_commit_date=$(git log -1 --format=%cd --date=unix)
           last_day=$(date -d '-1 day' +%s)
 
-#          if [ "${last_commit_date}" -lt "${last_day}" ]; then
-#            echo "Nothig new to build."
-#            echo "Last commit:"
-#            git log -1 --format='%C(auto)%h (%cd) - %s' --date=relative
-#            exit 0
-#          fi
-
           sudo docker run --rm --privileged \
             multiarch/qemu-user-static --reset -p yes
 
