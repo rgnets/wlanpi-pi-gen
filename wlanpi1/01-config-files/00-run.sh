@@ -12,6 +12,17 @@ on_chroot <<CHEOF
 		echo "retry 600;" >> /etc/dhcp/dhclient.conf
 	fi
 
+	if grep -A6 "^[[:space:]]*request" /etc/dhcp/dhclient.conf | grep -q "rfc3442-classless-static-routes" && ! grep -q "#.*rfc3442-classless-static-routes" /etc/dhcp/dhclient.conf; then
+		sed -i '
+		/^[[:space:]]*request/{
+			:a
+			N
+			/;$/!ba
+			s/,[[:space:]]*rfc3442-classless-static-routes//
+			s/;$/;\n        # rfc3442-classless-static-routes/
+		}' /etc/dhcp/dhclient.conf
+	fi
+
 	# Send hardware MAC address to DHCP server
 	if grep -q -E "^#?send dhcp-client-identifier " /etc/dhcp/dhclient.conf; then
 		sed -i 's/^#\?send dhcp-client-identifier .*/send dhcp-client-identifier = hardware;/' /etc/dhcp/dhclient.conf
