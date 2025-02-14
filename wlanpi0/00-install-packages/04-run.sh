@@ -33,6 +33,6 @@ on_chroot <<CHEOF
 	apt update
 
 	# Install flent with basic tools
-	apt install netperf fping irtt
+	apt install -y netperf fping irtt
 	apt install -y --no-install-recommends flent
 CHEOF
