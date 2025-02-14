@@ -14,8 +14,8 @@ wlanpi-misc-firmware
 wlanpi-grafana
 scandump
 libpcap0.8/bullseye-backports
-wpasupplicant/bullseye-backports
-hostapd/bullseye-backports
+wpasupplicant
+hostapd
 wlanpi-librespeed-cli
 cockpit/bullseye-backports
 cockpit-packagekit
