@@ -208,7 +208,8 @@ export GIT_HASH=${GIT_HASH:-"$(git rev-parse HEAD)"}
 export COMMITS_FROM_LAST=${COMMITS_FROM_LAST:-"$(git log --oneline "${LAST_VERSION}"..${GIT_HASH})"}
 
 export VERSION_BUMP=${REQUEST_BUMP:-auto}
-export NEW_VERSION=$(source "${SCRIPT_DIR}/update_version.sh" "${VERSION_BUMP}")
+NEW_VERSION_OUTPUT=$(source "${SCRIPT_DIR}/update_version.sh" "${VERSION_BUMP}")
+export NEW_VERSION=$(echo "$NEW_VERSION_OUTPUT" | tail -n1)
 echo "NEW_VERSION is ${NEW_VERSION}"
 
 export USE_QEMU="${USE_QEMU:-0}"

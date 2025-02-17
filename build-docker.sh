@@ -139,10 +139,12 @@ else
 	wait "$!"
 fi
 
-if grep -q "version=" "$VOLUME"; then
-    echo "Debug: version was written to VOLUME: $(cat "$VOLUME")"
+HOST_VOLUME_PATH=$(echo "$VOLUME" | cut -d':' -f1)
+
+if [ -f "$HOST_VOLUME_PATH" ] && grep -q "version=" "$HOST_VOLUME_PATH"; then
+    echo "Debug: version was written to volume: $(cat "$HOST_VOLUME_PATH")"
 else
-    echo "Error: Failed to find version in VOLUME"
+    echo "Error: Failed to find version in volume at $HOST_VOLUME_PATH"
 fi
 
 echo "copying results from deploy/"
