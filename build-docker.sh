@@ -104,6 +104,7 @@ if [ "${CONTAINER_EXISTS}" != "" ]; then
 		-e "LAST_VERSION=${LAST_VERSION}" \
 		-e "LAST_VERSION_HASH=${LAST_VERSION_HASH}" \
 		-e "COMMITS_FROM_LAST=${COMMITS_FROM_LAST}" \
+		-e "REQUEST_BUMP=${REQUEST_BUMP}" \
 		-v $VOLUME \
 		--volumes-from="${CONTAINER_NAME}" --name "${CONTAINER_NAME}_cont" \
 		pi-gen \
@@ -126,6 +127,7 @@ else
 		-e "LAST_VERSION=${LAST_VERSION}" \
 		-e "LAST_VERSION_HASH=${LAST_VERSION_HASH}" \
 		-e "COMMITS_FROM_LAST=${COMMITS_FROM_LAST}" \
+		-e "REQUEST_BUMP=${REQUEST_BUMP}" \
 		-v $VOLUME \
 		pi-gen \
 		bash -e -o pipefail -c "dpkg-reconfigure qemu-user-static &&

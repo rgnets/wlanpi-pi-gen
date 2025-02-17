@@ -45,6 +45,8 @@ jobs:
           
       - name: Build image
         id: build-image
+        env:
+          REQUEST_BUMP: ${{ github.event.inputs.version-bump }}
         run: |
           last_commit_date=$(git log -1 --format=%cd --date=unix)
           last_day=$(date -d '-1 day' +%s)
@@ -59,7 +61,7 @@ jobs:
           sudo docker run --rm --privileged \
             multiarch/qemu-user-static --reset -p yes
 
-          sudo ./build-docker.sh -v ${{ github.workspace }}/output.env:/output.env
+          sudo -E ./build-docker.sh -v ${{ github.workspace }}/output.env:/output.env
 
       - name: Load and export docker output
         run: |
