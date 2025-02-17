@@ -35,6 +35,10 @@ jobs:
         with:
           fetch-depth: '0'
 
+      - name: Show version bump input
+        run: |
+          echo "Version bump input: ${{ github.event.inputs.version-bump }}"
+      
       - name: Prepare docker output
         run: |
           touch output.env
