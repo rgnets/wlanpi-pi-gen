@@ -12,6 +12,17 @@ on_chroot <<CHEOF
 		echo "retry 600;" >> /etc/dhcp/dhclient.conf
 	fi
 
+	if grep -A6 "^[[:space:]]*request" /etc/dhcp/dhclient.conf | grep -q "rfc3442-classless-static-routes" && ! grep -q "#.*rfc3442-classless-static-routes" /etc/dhcp/dhclient.conf; then
+		sed -i '
+		/^[[:space:]]*request/{
+			:a
+			N
+			/;$/!ba
+			s/,[[:space:]]*rfc3442-classless-static-routes//
+			s/;$/;\n        # rfc3442-classless-static-routes/
+		}' /etc/dhcp/dhclient.conf
+	fi
+
 	# Send hardware MAC address to DHCP server
 	if grep -q -E "^#?send dhcp-client-identifier " /etc/dhcp/dhclient.conf; then
 		sed -i 's/^#\?send dhcp-client-identifier .*/send dhcp-client-identifier = hardware;/' /etc/dhcp/dhclient.conf
@@ -52,9 +63,9 @@ on_chroot <<CHEOF
 	echo "denyinterfaces usb* pan*" | tee -a /etc/dhcpcd.conf
 
 	# Install wireless-regdb which supports Wi-Fi 6E
-	wget -O /tmp/wireless-regdb_2024.10.07-1_all.deb http://ftp.us.debian.org/debian/pool/main/w/wireless-regdb/wireless-regdb_2024.10.07-1_all.deb
-	dpkg -i /tmp/wireless-regdb_2024.10.07-1_all.deb
-	rm -f /tmp/wireless-regdb_2024.10.07-1_all.deb
+	wget -O /tmp/wireless-regdb_2024.10.07-2_all.deb http://ftp.us.debian.org/debian/pool/main/w/wireless-regdb/wireless-regdb_2024.10.07-2_all.deb
+	dpkg -i /tmp/wireless-regdb_2024.10.07-2_all.deb
+	rm -f /tmp/wireless-regdb_2024.10.07-2_all.deb
 	update-alternatives --set regulatory.db /lib/firmware/regulatory.db-upstream
 
 	# Fix sntp permission error

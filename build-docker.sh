@@ -106,6 +106,7 @@ if [ "${CONTAINER_EXISTS}" != "" ]; then
 		-e "COMMITS_FROM_LAST=${COMMITS_FROM_LAST}" \
 		-e "FIRST_USER_NAME=${FIRST_USER_NAME}" \
 		-e "FIRST_USER_PASS=${FIRST_USER_PASS}" \
+		-e "REQUEST_BUMP=${REQUEST_BUMP}" \
 		-v $VOLUME \
 		--volumes-from="${CONTAINER_NAME}" --name "${CONTAINER_NAME}_cont" \
 		pi-gen \
@@ -130,6 +131,7 @@ else
 		-e "COMMITS_FROM_LAST=${COMMITS_FROM_LAST}" \
 		-e "FIRST_USER_NAME=${FIRST_USER_NAME}" \
 		-e "FIRST_USER_PASS=${FIRST_USER_PASS}" \
+		-e "REQUEST_BUMP=${REQUEST_BUMP}" \
 		-v $VOLUME \
 		pi-gen \
 		bash -e -o pipefail -c "dpkg-reconfigure qemu-user-static &&
@@ -141,10 +143,12 @@ else
 	wait "$!"
 fi
 
-if grep -q "version=" "$VOLUME"; then
-    echo "Debug: version was written to VOLUME: $(cat "$VOLUME")"
+HOST_VOLUME_PATH=$(echo "$VOLUME" | cut -d':' -f1)
+
+if [ -f "$HOST_VOLUME_PATH" ] && grep -q "version=" "$HOST_VOLUME_PATH"; then
+    echo "Debug: version was written to volume: $(cat "$HOST_VOLUME_PATH")"
 else
-    echo "Error: Failed to find version in VOLUME"
+    echo "Error: Failed to find version in volume at $HOST_VOLUME_PATH"
 fi
 
 echo "copying results from deploy/"

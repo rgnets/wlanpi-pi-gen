@@ -5,3 +5,6 @@ wlanpi-linux-firmware
 
 # Install 45Drives cockpit-navigator from packagecloud
 cockpit-navigator
+
+# Install gpsd
+gpsd

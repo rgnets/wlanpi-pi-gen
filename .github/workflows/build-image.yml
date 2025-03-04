@@ -32,11 +32,14 @@ jobs:
     runs-on: "${{ vars.RUNS_ON || 'ubuntu-22.04' }}"
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: '0'
+
+      - name: Show version bump input
+        run: |
+          echo "Version bump input: ${{ github.event.inputs.version-bump }}"
 
       - name: Prepare docker output
         run: |
@@ -44,6 +47,10 @@ jobs:
 
       - name: Build image
         id: build-image
+        env:
+          REQUEST_BUMP: ${{ github.event.inputs.version-bump }}
+          FIRST_USER_NAME: ${{ vars.FIRST_USER_NAME }}
+          FIRST_USER_PASS: ${{ vars.FIRST_USER_PASS }}
         run: |
           last_commit_date=$(git log -1 --format=%cd --date=unix)
           last_day=$(date -d '-1 day' +%s)
@@ -51,10 +58,8 @@ jobs:
           sudo docker run --rm --privileged \
             multiarch/qemu-user-static --reset -p yes
 
+
           sudo -E ./build-docker.sh -v ${{ github.workspace }}/output.env:/output.env
-        env:
-          FIRST_USER_NAME: ${{ vars.FIRST_USER_NAME }}
-          FIRST_USER_PASS: ${{ vars.FIRST_USER_PASS }}
 
       - name: Load and export docker output
         run: |
@@ -118,7 +123,7 @@ jobs:
       - name: Chown the dir for next time
         if: always()
         run: |
-          sudo chown -R ubuntu:ubuntu ./*
+          sudo chown -R ubuntu:ubuntu ./* || true
 
   slack-workflow-status:
     if: ${{ always() && (github.repository_owner == 'WLAN-Pi') && (! github.event.pull_request.head.repo.fork) }}
