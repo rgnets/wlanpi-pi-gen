@@ -51,6 +51,7 @@ jobs:
           REQUEST_BUMP: ${{ github.event.inputs.version-bump }}
           FIRST_USER_NAME: ${{ vars.FIRST_USER_NAME }}
           FIRST_USER_PASS: ${{ vars.FIRST_USER_PASS }}
+          PRESERVE_CONTAINER: "${{ vars.PRESERVE_CONTAINER || 0 }}"
         run: |
           last_commit_date=$(git log -1 --format=%cd --date=unix)
           last_day=$(date -d '-1 day' +%s)
