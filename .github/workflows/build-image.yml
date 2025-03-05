@@ -45,6 +45,11 @@ jobs:
         run: |
           touch output.env
 
+      - name: Remove Old docker container unless continue
+        if: ${{ always() && (vars.CONTINUE == 1) }}
+        run: |
+          sudo docker rm -v pigen_work || true
+
       - name: Build image
         id: build-image
         env:
@@ -52,6 +57,7 @@ jobs:
           FIRST_USER_NAME: ${{ vars.FIRST_USER_NAME }}
           FIRST_USER_PASS: ${{ vars.FIRST_USER_PASS }}
           PRESERVE_CONTAINER: "${{ vars.PRESERVE_CONTAINER || 0 }}"
+          CONTINUE: "${{ vars.CONTINUE || 0 }}"
         run: |
           last_commit_date=$(git log -1 --format=%cd --date=unix)
           last_day=$(date -d '-1 day' +%s)
