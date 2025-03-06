@@ -46,7 +46,7 @@ jobs:
           touch output.env
 
       - name: Remove Old docker container unless continue
-        if: ${{ always() && (vars.CONTINUE == 1) }}
+        if: ${{ always() && (vars.CONTINUE != 1) }}
         run: |
           sudo docker rm -v pigen_work || true
 
