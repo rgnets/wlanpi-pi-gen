@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+# TODO: Add variation for release
+
 on_chroot <<CHEOF
 	# MDK: Add dev repo
     curl -s https://packagecloud.io/install/repositories/rgnets_mdk/wlanpi-dev/script.deb.sh | sudo bash
