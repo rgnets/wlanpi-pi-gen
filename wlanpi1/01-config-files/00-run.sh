@@ -63,6 +63,7 @@ on_chroot <<CHEOF
 	echo "denyinterfaces usb* pan*" | tee -a /etc/dhcpcd.conf
 
   REGDB_FILE="wireless-regdb_2025.02.20-1_all.deb"
+  echo "Downloading wireless regdb $REGDB_FILE"
 	# Install wireless-regdb which supports Wi-Fi 6E
 	wget -O /tmp/$REGDB_FILE http://ftp.us.debian.org/debian/pool/main/w/wireless-regdb/$REGDB_FILE
 	dpkg -i /tmp/$REGDB_FILE
