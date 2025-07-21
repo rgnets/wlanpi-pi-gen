@@ -128,7 +128,7 @@ jobs:
           path: deploy/*.log
 
       - name: Setup SSH agent and key
-        if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch)  || github.event.ref == format('refs/heads/{0}', 'rg-release')  }}
+        if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch)  || github.event.ref == format('refs/heads/{0}', 'rg-release') || github.event.ref == format('refs/heads/{0}', 'rg-dev')  }}
         run: |
           # Create temp directory with restrictive permissions
           export SSH_TEMP_DIR=$(mktemp -d)
@@ -161,12 +161,23 @@ jobs:
           for file in *.zip; do
             if [ -f "$file" ]; then
               echo "Uploading $file..."
-              ../upload.sh "$file"
+              BUILD_SERVER_PATH=${{ vars.BUILD_SERVER_PATH_RELEASE }} ../upload.sh "$file"
+            fi
+          done
+
+      - name: Upload beta to build server
+        if: ${{ github.event.ref == format('refs/heads/{0}', 'rg-dev')  }}
+        run: |
+          cd deploy
+          for file in *.zip; do
+            if [ -f "$file" ]; then
+              echo "Uploading $file..."
+              BUILD_SERVER_PATH=${{ vars.BUILD_SERVER_PATH_BETA }} ../upload.sh "$file"
             fi
           done
 
       - name: Cleanup SSH agent and keys
-        if: ${{ always() && (github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch)  || github.event.ref == format('refs/heads/{0}', 'rg-release')) }}
+        if: ${{ always()  }}
         run: |
           # Kill SSH agent if it exists
           if [ -n "$SSH_AGENT_PID" ]; then
