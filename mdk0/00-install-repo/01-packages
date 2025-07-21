@@ -1,3 +1,7 @@
 wlanpi-core=1.0.5-12
 wlanpi-mqtt-bridge=1.0.0-1+deb12u10.7
-wlanpi-rxg-agent=1.0.1-8
+wlanpi-rxg-agent=1.0.1-10
+libre=3.23.0
+libre-dev=3.23.0
+baresip=3.23.0
+libbaresip=3.23.0
