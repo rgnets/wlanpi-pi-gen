@@ -48,7 +48,7 @@ jobs:
       - name: Remove Old docker container unless continue
         if: ${{ always() && (vars.CONTINUE != 1) }}
         run: |
-          sudo docker rm -v pigen_work || true
+          sudo docker kill -v pigen_work || sudo docker rm -v pigen_work || true
 
       - name: Build image
         id: build-image
