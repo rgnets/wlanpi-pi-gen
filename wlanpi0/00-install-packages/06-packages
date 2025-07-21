@@ -13,11 +13,11 @@ wlanpi-wipry
 wlanpi-misc-firmware
 wlanpi-grafana
 scandump
-libpcap0.8/bullseye-backports
+libpcap0.8
 wpasupplicant
 hostapd
 wlanpi-librespeed-cli
-cockpit/bullseye-backports
+cockpit
 cockpit-packagekit
 cockpit-storaged
 
