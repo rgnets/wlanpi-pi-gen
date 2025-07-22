@@ -138,7 +138,8 @@ jobs:
           # Create private key file
           echo "${{ secrets.BUILD_SERVER_PRIVATE_KEY }}" > "$SSH_TEMP_DIR/build_id"
           echo "${{ secrets.JUMP_SERVER_PRIVATE_KEY }}" > "$SSH_TEMP_DIR/jump_id"
-          chmod 600 "$SSH_TEMP_DIR/*_id"
+          chmod 600 "$SSH_TEMP_DIR/build_id"
+          chmod 600 "$SSH_TEMP_DIR/jump_id"
           
           # Start SSH agent and capture PID/socket
           eval $(ssh-agent -s)
