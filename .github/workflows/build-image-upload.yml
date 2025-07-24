@@ -58,17 +58,29 @@ jobs:
 
       - name: Upload release to build server
         if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch)  || github.event.ref == format('refs/heads/{0}', 'rg-release')  }}
+        env:
+          BUILD_SERVER_PATH: ${{ vars.BUILD_SERVER_PATH_RELEASE }}
+          BUILD_SERVER_USER: ${{ vars.BUILD_SERVER_USER }}
+          BUILD_SERVER: ${{ vars.BUILD_SERVER }}
+          JUMP_SERVER_USER: "${{ vars.JUMP_SERVER_USER }}"
+          JUMP_SERVER: "${{ vars.JUMP_SERVER }}"
         run: |
           cd deploy
           for file in *.zip; do
             if [ -f "$file" ]; then
               echo "Uploading $file..."
-              BUILD_SERVER_PATH=${{ vars.BUILD_SERVER_PATH_RELEASE }} ../upload.sh "$file"
+              ../upload.sh "$file"
             fi
           done
 
       - name: Upload beta to build server
 #        if: ${{ always()  }} # ${{ github.event.ref == format('refs/heads/{0}', 'rg-dev')  }}
+        env:
+          BUILD_SERVER_PATH: ${{ vars.BUILD_SERVER_PATH_BETA }}
+          BUILD_SERVER_USER: ${{ vars.BUILD_SERVER_USER }}
+          BUILD_SERVER: ${{ vars.BUILD_SERVER }}
+          JUMP_SERVER_USER: "${{ vars.JUMP_SERVER_USER }}"
+          JUMP_SERVER: "${{ vars.JUMP_SERVER }}"
         run: |
           cd deploy
           for file in *.zip; do
