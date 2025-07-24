@@ -54,7 +54,10 @@ jobs:
           # Setup known hosts
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ vars.JUMP_SERVER }} >> ~/.ssh/known_hosts
-          ssh ${{ vars.JUMP_SERVER_USER }}@${{ vars.JUMP_SERVER }} "ssh-keyscan -H ${{ vars.BUILD_SERVER }}" >> ~/.ssh/known_hosts
+          # Echo build server host key from known key. We can't scan for it because we only have jump perms.
+          echo "${{ vars.BUILD_SERVER_HOST_KEY }}  >> ~/.ssh/known_hosts
+          
+          #ssh ${{ vars.JUMP_SERVER_USER }}@${{ vars.JUMP_SERVER }} "ssh-keyscan -H ${{ vars.BUILD_SERVER }}" >> ~/.ssh/known_hosts
 
       - name: Upload release to build server
         if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch)  || github.event.ref == format('refs/heads/{0}', 'rg-release')  }}
