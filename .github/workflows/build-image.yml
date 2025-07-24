@@ -58,6 +58,7 @@ jobs:
           FIRST_USER_PASS: ${{ vars.FIRST_USER_PASS }}
           PRESERVE_CONTAINER: "${{ vars.PRESERVE_CONTAINER || 0 }}"
           CONTINUE: "${{ vars.CONTINUE || 0 }}"
+          DEPLOY_ZIP: 0
         run: |
           last_commit_date=$(git log -1 --format=%cd --date=unix)
           last_day=$(date -d '-1 day' +%s)
@@ -76,10 +77,15 @@ jobs:
           done < output.env
           echo "All variables from output.env have been added to GITHUB_ENV."
 
+      - name: Compress with gzip
+        id: compress-image
+        rune: |
+          cd deploy; for file in *.img; do gzip $file; done; cd ../
+
       - name: Generate checksum
         id: generate-checksum
         run: |
-          cd deploy; for file in *.zip; do sha256sum --binary $file | sudo tee "${file}.sha256"; done; cd ../
+          cd deploy; for file in *.img.gz; do sha256sum --binary $file | sudo tee "${file}.sha256"; done; cd ../
 
       - name: Get current date
         id: date
@@ -93,19 +99,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
-          path: deploy/*.zip
+          compression-level: 0
+          path: |
+            deploy/*.img.gz
+            deploy/*.sha256
+            deploy/*.info
+            deploy/rg-wlanpi-os/os.json
 
-      - name: Upload zipped image checksum
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_NAME }}-sha256
-          path: deploy/*.sha256
-
-      - name: Upload image info
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_NAME }}-info
-          path: deploy/*.info
 
       - name: Create pre-release from default branch
         if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch)  || github.event.ref == format('refs/heads/{0}', 'rg-release')  }}
@@ -115,7 +115,7 @@ jobs:
           automatic_release_tag: ${{ env.version }}
           prerelease: true
           files: |
-            deploy/*.zip
+            deploy/*.img.gz
             deploy/*.info
             deploy/rg-wlanpi-os/os.json
             deploy/*.sha256
