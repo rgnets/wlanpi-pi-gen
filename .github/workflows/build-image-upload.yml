@@ -22,6 +22,8 @@ jobs:
 
       - name: Create fake zip
         run: |
+          mkdir -p deploy
+          cd deploy
           echo "test" >> testfile.txt
           zip test.zip testfile.txt
           
