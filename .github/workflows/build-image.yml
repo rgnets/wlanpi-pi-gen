@@ -79,7 +79,7 @@ jobs:
 
       - name: Compress with gzip
         id: compress-image
-        rune: |
+        run: |
           cd deploy; for file in *.img; do gzip $file; done; cd ../
 
       - name: Generate checksum
