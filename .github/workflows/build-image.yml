@@ -58,6 +58,7 @@ jobs:
           FIRST_USER_PASS: ${{ vars.FIRST_USER_PASS }}
           PRESERVE_CONTAINER: "${{ vars.PRESERVE_CONTAINER || 0 }}"
           CONTINUE: "${{ vars.CONTINUE || 0 }}"
+          DEPLOY_ZIP: 0
         run: |
           last_commit_date=$(git log -1 --format=%cd --date=unix)
           last_day=$(date -d '-1 day' +%s)
@@ -67,6 +68,7 @@ jobs:
 
 
           sudo -E ./build-docker.sh -v ${{ github.workspace }}/output.env:/output.env
+          cd deploy; for file in *.img; do gzip $file; done; cd ../
 
       - name: Load and export docker output
         run: |
@@ -79,7 +81,7 @@ jobs:
       - name: Generate checksum
         id: generate-checksum
         run: |
-          cd deploy; for file in *.zip; do sha256sum --binary $file | sudo tee "${file}.sha256"; done; cd ../
+          cd deploy; for file in *.img.gz; do sha256sum --binary $file | sudo tee "${file}.sha256"; done; cd ../
 
       - name: Get current date
         id: date
@@ -93,19 +95,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_NAME }}
-          path: deploy/*.zip
+          compression-level: 0
+          path: |
+            deploy/*.img.gz
+            deploy/*.sha256
+            deploy/*.info
+            deploy/rg-wlanpi-os/os.json
 
-      - name: Upload zipped image checksum
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_NAME }}-sha256
-          path: deploy/*.sha256
-
-      - name: Upload image info
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_NAME }}-info
-          path: deploy/*.info
 
       - name: Create pre-release from default branch
         if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch)  || github.event.ref == format('refs/heads/{0}', 'rg-release')  }}
@@ -115,7 +111,7 @@ jobs:
           automatic_release_tag: ${{ env.version }}
           prerelease: true
           files: |
-            deploy/*.zip
+            deploy/*.img.gz
             deploy/*.info
             deploy/rg-wlanpi-os/os.json
             deploy/*.sha256
@@ -128,52 +124,52 @@ jobs:
           path: deploy/*.log
 
       - name: Setup SSH agent and key
-        if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch)  || github.event.ref == format('refs/heads/{0}', 'rg-release') || github.event.ref == format('refs/heads/{0}', 'rg-dev')  }}
+        if: steps.build-image.outcome == 'success'
+#        if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event.ref == format('refs/heads/{0}', 'rg-release') || github.event.ref == format('refs/heads/{0}', 'rg-dev')  }}
         run: |
           # Create temp directory with restrictive permissions
           export SSH_TEMP_DIR=$(mktemp -d)
           echo "SSH_TEMP_DIR=$SSH_TEMP_DIR" >> $GITHUB_ENV
           chmod 700 "$SSH_TEMP_DIR"
-          
+
           # Create private key file
           echo "${{ secrets.BUILD_SERVER_PRIVATE_KEY }}" > "$SSH_TEMP_DIR/build_id"
           echo "${{ secrets.JUMP_SERVER_PRIVATE_KEY }}" > "$SSH_TEMP_DIR/jump_id"
           chmod 600 "$SSH_TEMP_DIR/build_id"
           chmod 600 "$SSH_TEMP_DIR/jump_id"
-          
+
           # Start SSH agent and capture PID/socket
           eval $(ssh-agent -s)
           echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
           echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
-          
+
           # Add key to agent
           ssh-add "$SSH_TEMP_DIR/build_id"
           ssh-add "$SSH_TEMP_DIR/jump_id"
-          
+
           # Setup known hosts
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ vars.JUMP_SERVER }} >> ~/.ssh/known_hosts
-          ssh ${{ vars.JUMP_SERVER_USER }}@${{ vars.JUMP_SERVER }} "ssh-keyscan -H ${{ vars.BUILD_SERVER }}" >> ~/.ssh/known_hosts
+          # Echo build server host key from known key. We can't scan for it because we only have jump perms.
+          echo "${{ vars.BUILD_SERVER_HOST_KEY }}"  >> ~/.ssh/known_hosts
+
+          #ssh ${{ vars.JUMP_SERVER_USER }}@${{ vars.JUMP_SERVER }} "ssh-keyscan -H ${{ vars.BUILD_SERVER }}" >> ~/.ssh/known_hosts
 
       - name: Upload release to build server
-        if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch)  || github.event.ref == format('refs/heads/{0}', 'rg-release')  }}
+        if: steps.build-image.outcome == 'success'
+#        if: ${{ github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event.ref == format('refs/heads/{0}', 'rg-release') || github.event.ref == format('refs/heads/{0}', 'rg-dev') }}
+        env:
+          BUILD_SERVER_PATH: ${{  ((github.event.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event.ref == format('refs/heads/{0}', 'rg-release')) && vars.BUILD_SERVER_PATH_RELEASE) || (github.event.ref == format('refs/heads/{0}', 'rg-dev') && vars.BUILD_SERVER_PATH_BETA ) || vars.BUILD_SERVER_PATH_ALPHA  }}
+          BUILD_SERVER_USER: ${{ vars.BUILD_SERVER_USER }}
+          BUILD_SERVER: ${{ vars.BUILD_SERVER }}
+          JUMP_SERVER_USER: ${{ vars.JUMP_SERVER_USER }}
+          JUMP_SERVER: ${{ vars.JUMP_SERVER }}
         run: |
           cd deploy
-          for file in *.zip; do
+          for file in *.{img.gz,zip,info,sha256}; do
             if [ -f "$file" ]; then
               echo "Uploading $file..."
-              BUILD_SERVER_PATH=${{ vars.BUILD_SERVER_PATH_RELEASE }} ../upload.sh "$file"
-            fi
-          done
-
-      - name: Upload beta to build server
-        if: ${{ github.event.ref == format('refs/heads/{0}', 'rg-dev')  }}
-        run: |
-          cd deploy
-          for file in *.zip; do
-            if [ -f "$file" ]; then
-              echo "Uploading $file..."
-              BUILD_SERVER_PATH=${{ vars.BUILD_SERVER_PATH_BETA }} ../upload.sh "$file"
+              ../upload.sh "$file"
             fi
           done
 
@@ -185,13 +181,13 @@ jobs:
             echo "Killing SSH agent (PID: $SSH_AGENT_PID)"
             kill $SSH_AGENT_PID || true
           fi
-          
+
           # Remove temporary directory and key files
           if [ -n "$SSH_TEMP_DIR" ] && [ -d "$SSH_TEMP_DIR" ]; then
             echo "Removing temporary SSH directory"
             rm -rf "$SSH_TEMP_DIR"
           fi
-          
+
           # Clear SSH auth socket
           unset SSH_AUTH_SOCK
           unset SSH_AGENT_PID
