@@ -68,7 +68,7 @@ jobs:
           done
 
       - name: Upload beta to build server
-        if: ${{ always()  }} # ${{ github.event.ref == format('refs/heads/{0}', 'rg-dev')  }}
+#        if: ${{ always()  }} # ${{ github.event.ref == format('refs/heads/{0}', 'rg-dev')  }}
         run: |
           cd deploy
           for file in *.zip; do
