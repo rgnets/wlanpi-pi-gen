@@ -115,7 +115,7 @@ if [ "${CONTAINER_EXISTS}" != "" ]; then
 	(mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc || true) &&
 	cd /pi-gen; (./build.sh ${BUILD_OPTS} || true);
 	rsync -av work/*/build.log deploy/;
-	rsync -av work/wlanpi/stage0/debootstrap.log deploy/ || true" &
+	rsync -av work/*/stage0/debootstrap.log deploy/ || true" &
 	wait "$!"
 else
 	trap 'echo "got CTRL+C... please wait 5s" && ${DOCKER} stop -t 5 ${CONTAINER_NAME}' SIGINT SIGTERM
@@ -139,7 +139,7 @@ else
 	(mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc || true) &&
 	cd /pi-gen; (./build.sh ${BUILD_OPTS} || true);
 	rsync -av work/*/build.log deploy/;
-	rsync -av work/wlanpi/stage0/debootstrap.log deploy/ || true" &
+	rsync -av work/*/stage0/debootstrap.log deploy/ || true" &
 	wait "$!"
 fi
 
@@ -160,7 +160,9 @@ if [ "${PRESERVE_CONTAINER}" != "1" ]; then
 	${DOCKER} rm -v "${CONTAINER_NAME}"
 fi
 
-if [ -f deploy/*.zip ]; then
+# Consider a build successful if at least one image artifact exists.
+# Accept raw images (.img), gzipped images (.img.gz), or zips (.zip).
+if find deploy -maxdepth 1 -type f \( -name '*.img' -o -name '*.img.gz' -o -name '*.zip' \) | grep -q .; then
 	echo "Done! Your image(s) should be in deploy/"
 else
 	echo "Build failed. Logs are in deploy/"
