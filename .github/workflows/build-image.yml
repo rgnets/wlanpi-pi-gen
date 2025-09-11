@@ -69,7 +69,9 @@ jobs:
 
 
           sudo -E ./build-docker.sh -v ${{ github.workspace }}/output.env:/output.env
-          cd deploy; for file in *.img; do gzip $file; done; cd ../
+          # Ensure host has ownership of copied artifacts before compression
+          sudo chown -R $(id -u):$(id -g) deploy || true
+          cd deploy; for file in *.img; do gzip "$file"; done; cd ../
 
       - name: Load and export docker output
         run: |
