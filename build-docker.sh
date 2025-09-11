@@ -114,8 +114,8 @@ if [ "${CONTAINER_EXISTS}" != "" ]; then
 	# binfmt_misc is sometimes not mounted with debian bullseye image
 	(mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc || true) &&
 	cd /pi-gen; (./build.sh ${BUILD_OPTS} || true);
-	rsync -av work/*/build.log deploy/;
-	rsync -av work/*/stage0/debootstrap.log deploy/ || true" &
+	rsync -av work/${IMG_NAME}/build.log deploy/;
+	rsync -av work/${IMG_NAME}/stage0/debootstrap.log deploy/ || true" &
 	wait "$!"
 else
 	trap 'echo "got CTRL+C... please wait 5s" && ${DOCKER} stop -t 5 ${CONTAINER_NAME}' SIGINT SIGTERM
@@ -138,8 +138,8 @@ else
 	# binfmt_misc is sometimes not mounted with debian bullseye image
 	(mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc || true) &&
 	cd /pi-gen; (./build.sh ${BUILD_OPTS} || true);
-	rsync -av work/*/build.log deploy/;
-	rsync -av work/*/stage0/debootstrap.log deploy/ || true" &
+	rsync -av work/${IMG_NAME}/build.log deploy/;
+	rsync -av work/${IMG_NAME}/stage0/debootstrap.log deploy/ || true" &
 	wait "$!"
 fi
 
